@@ -25,6 +25,5 @@ Then `make bootstrap`
 TBD ` 
 
 ### TODO
-- integration tests 
-- figure out bytes Tags in proto spans
+
 
