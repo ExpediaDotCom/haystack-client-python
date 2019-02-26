@@ -10,7 +10,10 @@ collector_url = os.env["COLLECTOR_URL"]
 client_id = os.env["HAYSTACK_CLIENT_ID"]
 api_key = os.env["HAYSTACK_API_KEY"]
 recorder = HaystackHttpRecorder(collector_url, client_id, api_key)
-opentracing.tracer = HaystackTracer("example-service", recorder)
+common_tags = {
+    "svc_ver": os["VERSION"]
+}
+opentracing.tracer = HaystackTracer("example-service", recorder, common_tags=common_tags)
 
 
 def invoke_downstream(headers):

@@ -46,9 +46,9 @@ def make_a_downstream_request():
 
 
 def use_http_recorder():
-    endpoint = "https://haystack-collector.exp-test.net/span"
-    api_key = "34352ab5-af8c-4f36-998f-9c0c5bccfaab"
-    client_id = "haystack-agent-test-app"
+    endpoint = "<collector endpoint>"
+    api_key = "<optional api key>"
+    client_id = "<optional client id>"
     global recorder
     recorder = HaystackHttpRecorder(endpoint, client_id, api_key)
 

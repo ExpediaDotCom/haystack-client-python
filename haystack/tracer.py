@@ -62,7 +62,6 @@ class HaystackTracer(Tracer):
             if scope is not None:
                 parent_ctx = scope.span.context
 
-        # Create the span context
         new_ctx = SpanContext(span_id=format(uuid.uuid4()))
         if parent_ctx is not None:
             if parent_ctx.baggage is not None:

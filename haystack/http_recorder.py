@@ -31,8 +31,8 @@ class HaystackHttpRecorder(SpanRecorder):
     at the provided address.
     """
 
-    def __init__(self, collector_url, client_id, api_key, timeout_seconds=DEFAULT_TIMEOUT, use_json_payload=False,
-                 executor=None):
+    def __init__(self, collector_url="http://haystack-collector:8080/span", client_id=None, api_key=None,
+                 timeout_seconds=DEFAULT_TIMEOUT, use_json_payload=False, executor=None):
         """
         :param collector_url: the haystack collector endpoint
         :param client_id: the haystack client id
@@ -47,8 +47,8 @@ class HaystackHttpRecorder(SpanRecorder):
         self._use_json_payload = use_json_payload
         session = ExceptionAwareRequestsSession()
         session.headers.update({
-            "X-Client-Id": client_id,
-            "X-Api-Key": api_key,
+            "X-Client-Id": client_id if client_id is not None else "",
+            "X-Api-Key": api_key if api_key is not None else "",
             "Content-Type": "application/json" if use_json_payload else "application/octet-stream"
         })
         session.hooks["response"] = response_hook

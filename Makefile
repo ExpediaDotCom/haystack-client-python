@@ -12,16 +12,25 @@ test:
 
 .PHONY: example
 example: bootstrap
-	python examples/trivial/main.py
+	python examples/main.py
 	
 .PHONY: lint
 lint:
+	pip install flake8
 	python -m flake8 haystack/*.py
 	
 .PHONY: integration_tests
 integration_tests:
 	docker-compose -f tests/integration/docker-compose.yml -p sandbox up -d
 	sleep 15
+	docker run -it \
+	    --rm \
+		--network=sandbox_default \
+		-v $(PWD):/ws \
+		-w /ws \
+		python:3.6 \
+		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'
+	docker-compose -f integration-tests/docker-compose.yml -p sandbox stop
 	
 .PHONY: dist
 dist: bootstrap lint test integration_tests
