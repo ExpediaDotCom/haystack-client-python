@@ -1,4 +1,4 @@
 # Changes by Version
 
-## 0.0.1 (2019-02-14)
+## 1.0.0 (2019-02-25)
 Haystack OpenTracing compliant library for Python
