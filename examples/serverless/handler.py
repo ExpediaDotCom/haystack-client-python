@@ -38,7 +38,7 @@ def handler(event, context):
 
         # do some work (for ex. validation)
         # then log an event to the span which will timestamp the time taken up until this point
-        span.log_kv({"validation_result", "success"})
+        span.log_kv({"validation_result": "success"})
 
         # an example of invoking a downstream service
         # Behind the scenes this uses the scope_manger to access the current active span and create a child of it.
