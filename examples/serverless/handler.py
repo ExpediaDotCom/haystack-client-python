@@ -6,12 +6,11 @@ from opentracing.ext import tags
 from haystack import HaystackTracer
 from haystack import HaystackHttpRecorder
 
-collector_url = os.env["COLLECTOR_URL"]
-client_id = os.env["HAYSTACK_CLIENT_ID"]
-api_key = os.env["HAYSTACK_API_KEY"]
-recorder = HaystackHttpRecorder(collector_url, client_id, api_key)
+recorder = HaystackHttpRecorder(os.env["COLLECTOR_URL"])
+
+# suppose it is desired to tag all traces with the application version
 common_tags = {
-    "svc_ver": os["VERSION"]
+    "svc_ver": os["APP_VERSION"]
 }
 opentracing.tracer = HaystackTracer("example-service", recorder, common_tags=common_tags)
 

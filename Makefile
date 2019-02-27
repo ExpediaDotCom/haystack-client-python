@@ -23,15 +23,15 @@ lint:
 integration_tests:
 	docker-compose -f tests/integration/docker-compose.yml -p sandbox up -d
 	sleep 15
-	docker run -it \
+	docker run -it
 	    --rm \
 		--network=sandbox_default \
 		-v $(PWD):/ws \
 		-w /ws \
 		python:3.6 \
 		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'
-	docker-compose -f integration-tests/docker-compose.yml -p sandbox stop
-	
+	docker-compose -f tests/integration/docker-compose.yml -p sandbox stop
+
 .PHONY: dist
 dist: bootstrap lint test integration_tests
 	pip install wheel
@@ -47,5 +47,6 @@ publish:
 proto_compile:
 	git submodule init -- ./haystack-idl
 	git submodule update
-	python -m grpc_tools.protoc -I haystack-idl/proto --python_out=./haystack  haystack-idl/proto/span.proto
-	python -m grpc_tools.protoc -I haystack-idl/proto --python_out=./haystack --grpc_python_out=./haystack haystack-idl/proto/agent/spanAgent.proto
+	pip install grpcio-tools
+	python -m grpc_tools.protoc -I haystack-idl/ --python_out=./haystack  haystack-idl/proto/span.proto
+	python -m grpc_tools.protoc -I haystack-idl/proto --python_out=./haystack/proto --grpc_python_out=./haystack/proto agent/spanAgent.proto

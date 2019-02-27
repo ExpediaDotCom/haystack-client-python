@@ -10,16 +10,16 @@ recorder = LoggerRecorder()
 logging.basicConfig(level=logging.DEBUG)
 
 
-def act_as_remote_service(carrier):
+def act_as_remote_service(headers):
     # remote service would have it"s own tracer
-    with HaystackTracer("Service-B", recorder) as tracer:
+    with HaystackTracer("Service-B", recorder,) as tracer:
         opentracing.tracer = tracer
 
         # simulate network transfer delay
         time.sleep(.25)
 
         # now as-if this was executing on the remote service, extract the parent span ctx from headers
-        upstream_span_ctx = opentracing.tracer.extract(opentracing.Format.HTTP_HEADERS, carrier)
+        upstream_span_ctx = opentracing.tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
         with opentracing.tracer.start_active_span("controller_method", child_of=upstream_span_ctx) as parent_scope:
             parent_scope.span.set_tag(tags.SPAN_KIND, "server")
             # simulate downstream service doing some work before replying
@@ -46,19 +46,17 @@ def make_a_downstream_request():
 
 
 def use_http_recorder():
-    endpoint = "<collector endpoint>"
-    api_key = "<optional api key>"
-    client_id = "<optional client id>"
+    endpoint = "http://<replace>"
     global recorder
-    recorder = HaystackHttpRecorder(endpoint, client_id, api_key)
+    recorder = HaystackHttpRecorder(collector_url=endpoint)
 
 
 def main():
     """
     Represents an application/service
     """
-    # instantiate a tracer and set it to opentracing.tracer property
-    opentracing.tracer = HaystackTracer("Service-A", recorder)
+    # instantiate a tracer with app version common tag and set it to opentracing.tracer property
+    opentracing.tracer = HaystackTracer("Service-A", recorder, common_tags={"app.version": "1234"})
 
     logging.info("mock request received")
     with opentracing.tracer.start_active_span("a_controller_method") as parent_scope:
@@ -66,8 +64,8 @@ def main():
         # add a tag, tags are part of a span and do not propagate
         # (tags have semantic conventions, see https://opentracing.io/specification/conventions/)
         parent_scope.span.set_tag(tags.HTTP_URL, "http://localhost/mocksvc")
+        parent_scope.span.set_tag(tags.HTTP_METHOD, "GET")
         parent_scope.span.set_tag(tags.SPAN_KIND, "server")
-
 
         # doing some work.. validation, processing, etc
         time.sleep(.25)
