@@ -29,3 +29,7 @@ class TextPropagatorTest(unittest.TestCase):
         ctx = self.propagator.extract(carrier)
 
         self.assertIsNone(ctx)
+
+
+if __name__ == "__main__":
+    unittest.main()

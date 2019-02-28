@@ -7,7 +7,7 @@ import time
 from haystack.span_pb2 import Span
 from haystack import HaystackTracer
 from haystack import HaystackAgentRecorder
-from haystack import HaystackHttpRecorder
+from haystack import AsyncHttpRecorder
 
 logging.basicConfig(level=logging.INFO)
 consumer = KafkaConsumer("proto-spans", bootstrap_servers="kafkasvc:9092")
@@ -70,7 +70,7 @@ class HaystackIntegrationTests(unittest.TestCase):
         service_name = "http-test"
 
         opentracing.tracer = HaystackTracer(service_name,
-                                            HaystackHttpRecorder(
+                                            AsyncHttpRecorder(
                                                 collector_url="http://sandbox_haystack_collector_1:8080/span"))
         thread = threading.Thread(target=send_a_span, args=(span_name,))
 

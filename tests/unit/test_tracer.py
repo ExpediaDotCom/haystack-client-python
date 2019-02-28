@@ -1,5 +1,4 @@
 import unittest
-import opentracing
 from haystack import HaystackTracer
 from haystack.recorder import NoopRecorder
 
@@ -27,3 +26,7 @@ class HaystackTracerTests(unittest.TestCase):
 
         expected_tags = {**common_tags, **span_tags}
         self.assertDictEqual(expected_tags, span.tags)
+
+
+if __name__ == "__main__":
+    unittest.main()

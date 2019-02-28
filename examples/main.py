@@ -3,7 +3,7 @@ import time
 import logging
 from opentracing.ext import tags
 from haystack import HaystackTracer
-from haystack import HaystackHttpRecorder
+from haystack import AsyncHttpRecorder
 from haystack import LoggerRecorder
 
 recorder = LoggerRecorder()
@@ -48,7 +48,7 @@ def make_a_downstream_request():
 def use_http_recorder():
     endpoint = "http://<replace>"
     global recorder
-    recorder = HaystackHttpRecorder(collector_url=endpoint)
+    recorder = AsyncHttpRecorder(collector_url=endpoint)
 
 
 def main():

@@ -4,9 +4,19 @@ import os
 from requests import RequestException
 from opentracing.ext import tags
 from haystack import HaystackTracer
-from haystack import HaystackHttpRecorder
+from haystack import SyncHttpRecorder
 
-recorder = HaystackHttpRecorder(os.env["COLLECTOR_URL"])
+"""
+Note: Recorder implementation in serverless applications requires careful consideration. For Example, in AWS, due 
+to the way AWS lambda freezes execution context, it's not reliable to send requests via the AsyncHttpRecorder. If the 
+function is not time-sensitive in reply or is async, SyncHttpRecorder is a good fit as shown below. If the function 
+cannot afford to dispatch the span in-process, then it is recommended to either setup a haystack agent in the network 
+and utilize HaystackAgentRecorder or offload the span record dispatching via Queue -> Worker model. In AWS this could 
+mean implementing a SQSRecorder which puts the finished span onto a SQS queue. The queue could then notify a 
+lambda implementing SyncHttpRecorder to dispatch the records. 
+"""
+
+recorder = SyncHttpRecorder(os.env["COLLECTOR_URL"])
 
 # suppose it is desired to tag all traces with the application version
 common_tags = {
