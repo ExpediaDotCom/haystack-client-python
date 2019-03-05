@@ -23,6 +23,7 @@ setup(
         "Operating System :: OS Independent",
         "License :: OSI Approved :: Apache Software License",
     ],
+    python_requires=">=3.5",
     keywords=['opentracing', 'haystack', 'tracing', 'microservices', 'distributed'],
     packages=find_packages()
 )

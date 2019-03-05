@@ -5,8 +5,8 @@ class Propagator(ABC):
 
     @abstractmethod
     def inject(self, span_context, carrier):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def extract(self, carrier):
-        pass
+        raise NotImplementedError()

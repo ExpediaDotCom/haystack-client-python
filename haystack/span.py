@@ -6,7 +6,11 @@ from threading import Lock
 class SpanContext(opentracing.SpanContext):
     """Implements opentracing.SpanContext"""
 
-    def __init__(self, trace_id=None, span_id=None, parent_id=None, baggage=None):
+    def __init__(self,
+                 trace_id=None,
+                 span_id=None,
+                 parent_id=None,
+                 baggage=None):
         self.trace_id = trace_id
         self.span_id = span_id
         self.parent_id = parent_id
@@ -22,7 +26,10 @@ class SpanContext(opentracing.SpanContext):
             baggage[key] = value
         else:
             baggage.pop(key, None)
-        return SpanContext(trace_id=self.trace_id, span_id=self.span_id, parent_id=self.parent_id, baggage=baggage)
+        return SpanContext(trace_id=self.trace_id,
+                           span_id=self.span_id,
+                           parent_id=self.parent_id,
+                           baggage=baggage)
 
 
 class Span(opentracing.Span):
@@ -117,7 +124,8 @@ class Span(opentracing.Span):
         of this :class:`Span`.
 
         Note 2: Baggage is sent in-band with every subsequent local and remote
-        calls, so this feature must be used with care. (Don't create too much baggage :)
+        calls, so this feature must be used with care. (Don't create too
+        much baggage :)
 
         Note 3: Baggage is not visible in haystack UI. IPC communication only.
 
@@ -141,6 +149,8 @@ class Span(opentracing.Span):
 
 
 class LogData(object):
-    def __init__(self, key_values, timestamp=None):
+    def __init__(self,
+                 key_values,
+                 timestamp=None):
         self.key_values = key_values
         self.timestamp = time.time() if timestamp is None else timestamp

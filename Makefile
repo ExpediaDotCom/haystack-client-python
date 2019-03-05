@@ -17,7 +17,7 @@ example: bootstrap
 .PHONY: lint
 lint:
 	pip install flake8
-	python -m flake8 haystack/*.py
+	python -m flake8 ./haystack --exclude *_pb2*
 	
 .PHONY: integration_tests
 integration_tests:
@@ -26,7 +26,7 @@ integration_tests:
 	docker run -it
 	    --rm \
 		--network=sandbox_default \
-		-v $(PWD):/ws \
+		-v $(pwd):/ws \
 		-w /ws \
 		python:3.6 \
 		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'

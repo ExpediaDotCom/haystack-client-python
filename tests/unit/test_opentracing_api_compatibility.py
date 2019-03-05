@@ -6,7 +6,7 @@ from opentracing import Format
 
 
 class ModifiedAPICompatibilityCheckMixin(APICompatibilityCheckMixin):
-    #TODO implement binary propagator and remove this hack!
+    # TODO implement binary propagator and remove this hack!
     def test_binary_propagation(self):
         pass
 

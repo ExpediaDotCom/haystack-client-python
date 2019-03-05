@@ -1,7 +1,9 @@
 from .span_pb2 import Span, Tag
+from .constants import SECONDS_TO_MICRO
 import numbers
+import logging
 
-SECONDS_TO_MICRO = 1000000
+logger = logging.getLogger("haystack")
 
 
 def tags_as_list(tags):
@@ -17,7 +19,9 @@ def logs_as_list(logs):
         kv_pairs = []
         for key, value in log_data.key_values.items():
             kv_pairs.append({"key": key, "value": value})
-        log_list.append({"timestamp": int(log_data.timestamp * SECONDS_TO_MICRO), "fields": kv_pairs})
+        log_list.append(
+            {"timestamp": int(log_data.timestamp * SECONDS_TO_MICRO),
+             "fields": kv_pairs})
     return log_list
 
 
@@ -34,9 +38,15 @@ def set_tag_value(tag, value):
     elif isinstance(value, float):
         tag.vDouble = value
         tag.type = Tag.DOUBLE
-    else:
-        tag.vBytes = bytes("n/a", encoding="utf-8")  # TODO figure this out.
+    elif isinstance(value, bytes):
+        tag.vBytes = value
         tag.type = Tag.BINARY
+    else:
+        logger.error(f"Dropped tag {tag.key} due to "
+                     f"invalid value type of {type(value)}. "
+                     f"Type must be Int, String, Bool, Float or Bytes")
+        tag.vStr = ""
+        tag.type = Tag.STRING
 
 
 def add_proto_tags(span_record, tags):
@@ -57,9 +67,12 @@ def add_proto_logs(span_record, logs):
 
 
 def span_to_proto(span):
-    span_record = Span(traceId=span.context.trace_id, spanId=span.context.span_id,
-                       parentSpanId=span.context.parent_id, serviceName=span.tracer.service_name,
-                       operationName=span.operation_name, startTime=int(span.start_time * SECONDS_TO_MICRO),
+    span_record = Span(traceId=span.context.trace_id,
+                       spanId=span.context.span_id,
+                       parentSpanId=span.context.parent_id,
+                       serviceName=span.tracer.service_name,
+                       operationName=span.operation_name,
+                       startTime=int(span.start_time * SECONDS_TO_MICRO),
                        duration=int(span.duration * SECONDS_TO_MICRO))
 
     add_proto_tags(span_record, span.tags)
@@ -82,29 +95,29 @@ def span_to_json(span):
 
 
 def span_to_string(span):
-    record = "operation="
+    record = "Operation="
     record += span.operation_name
-    record += ", traceid="
+    record += ", TraceId="
     record += span.context.trace_id
-    record += ", spanid="
+    record += ", SpanId="
     record += span.context.span_id
 
     if span.context.parent_id:
-        record += ", parentspanid="
+        record += ", ParentSpanId="
         record += span.context.parent_id
 
     if span.context.baggage:
         record += str(span.context.baggage)
 
     if span.tags:
-        record += ", tags=" + str(tags_as_list(span.tags))
+        record += ", Tags=" + str(tags_as_list(span.tags))
 
     if span.logs:
-        record += ", logs=" + str(logs_as_list(span.logs))
+        record += ", Logs=" + str(logs_as_list(span.logs))
 
-    record += ", starttime="
+    record += ", StartTime="
     record += str(int(span.start_time * SECONDS_TO_MICRO))
-    record += ", duration="
+    record += ", Duration="
     record += str(int(span.duration * SECONDS_TO_MICRO))
 
     return record

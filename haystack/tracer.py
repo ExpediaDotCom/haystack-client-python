@@ -8,16 +8,24 @@ from .span import Span, SpanContext
 
 class HaystackTracer(Tracer):
 
-    def __init__(self, service_name, recorder, scope_manager=None, common_tags=None):
+    def __init__(self,
+                 service_name,
+                 recorder,
+                 scope_manager=None,
+                 common_tags=None):
         """
         Initialize a Haystack Tracer instance.
         :param service_name: The service name to which all spans will belong.
-        :param recorder: The recorder (dispatcher) implementation which handles finished spans.
-        :param scope_manager: An optional parameter to override the default ThreadLocal scope manager.
-        :param common_tags: An optional dictionary of tags which should be applied to all created spans for this service
+        :param recorder: The recorder (dispatcher) implementation which handles
+        finished spans.
+        :param scope_manager: An optional parameter to override the default
+        ThreadLocal scope manager.
+        :param common_tags: An optional dictionary of tags which should be
+        applied to all created spans for this service
         """
 
-        scope_manager = ThreadLocalScopeManager() if scope_manager is None else scope_manager
+        scope_manager = ThreadLocalScopeManager() if scope_manager is None \
+            else scope_manager
         super().__init__(scope_manager)
         self._propagators = {}
         self._common_tags = {} if common_tags is None else common_tags
@@ -35,15 +43,30 @@ class HaystackTracer(Tracer):
         """
         self._propagators[format] = propagator
 
-    def start_active_span(self, operation_name, child_of=None, references=None, tags=None, start_time=None,
-                          ignore_active_span=False, finish_on_close=True):
+    def start_active_span(self,
+                          operation_name,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None,
+                          ignore_active_span=False,
+                          finish_on_close=True):
 
-        span = self.start_span(operation_name=operation_name, child_of=child_of, references=references, tags=tags,
-                               start_time=start_time, ignore_active_span=ignore_active_span)
+        span = self.start_span(operation_name=operation_name,
+                               child_of=child_of,
+                               references=references,
+                               tags=tags,
+                               start_time=start_time,
+                               ignore_active_span=ignore_active_span)
 
         return self.scope_manager.activate(span, finish_on_close)
 
-    def start_span(self, operation_name=None, child_of=None, references=None, tags=None, start_time=None,
+    def start_span(self,
+                   operation_name=None,
+                   child_of=None,
+                   references=None,
+                   tags=None,
+                   start_time=None,
                    ignore_active_span=False):
 
         start_time = time.time() if start_time is None else start_time
@@ -75,7 +98,11 @@ class HaystackTracer(Tracer):
         if self._common_tags:
             tags = {**self._common_tags, **tags} if tags else self._common_tags
 
-        return Span(self, operation_name=operation_name, context=new_ctx, tags=tags, start_time=start_time)
+        return Span(self,
+                    operation_name=operation_name,
+                    context=new_ctx,
+                    tags=tags,
+                    start_time=start_time)
 
     def inject(self, span_context, format, carrier):
         if format in self._propagators:

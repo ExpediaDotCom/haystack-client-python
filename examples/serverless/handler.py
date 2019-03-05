@@ -7,12 +7,15 @@ from haystack import HaystackTracer
 from haystack import SyncHttpRecorder
 
 """
-Note: Recorder implementation in serverless applications requires careful consideration. For Example, in AWS, due 
-to the way AWS lambda freezes execution context, it's not reliable to send requests via the AsyncHttpRecorder. If the 
-function is not time-sensitive in reply or is async, SyncHttpRecorder is a good fit as shown below. If the function 
-cannot afford to dispatch the span in-process, then it is recommended to either setup a haystack agent in the network 
-and utilize HaystackAgentRecorder or offload the span record dispatching via Queue -> Worker model. In AWS this could 
-mean implementing a SQSRecorder which puts the finished span onto a SQS queue. The queue could then notify a 
+Note: Recorder implementation in serverless applications requires careful 
+consideration. For Example, in AWS, due to the way AWS lambda freezes execution 
+context, it's not reliable to send requests via the AsyncHttpRecorder. If the 
+function is not time-sensitive in reply or is async, SyncHttpRecorder is a good 
+fit as shown below. If the function cannot afford to dispatch the span 
+in-process, then it is recommended to either setup a haystack agent in the 
+network and utilize HaystackAgentRecorder or offload the span record dispatching
+via Queue -> Worker model. In AWS this could mean implementing a SQSRecorder 
+which puts the finished span onto a SQS queue. The queue could then notify a 
 lambda implementing SyncHttpRecorder to dispatch the records. 
 """
 
@@ -22,7 +25,8 @@ recorder = SyncHttpRecorder(os.env["COLLECTOR_URL"])
 common_tags = {
     "svc_ver": os["APP_VERSION"]
 }
-opentracing.tracer = HaystackTracer("example-service", recorder, common_tags=common_tags)
+opentracing.tracer = HaystackTracer("example-service",
+                                    recorder, common_tags=common_tags)
 
 
 def invoke_downstream(headers):
@@ -36,10 +40,12 @@ def process_downstream_response(response):
 def handler(event, context):
 
     # extract the span context from headers if this is a downstream service
-    parent_ctx = opentracing.tracer.extract(opentracing.Format.HTTP_HEADERS, event)
+    parent_ctx = opentracing.tracer.extract(opentracing.Format.HTTP_HEADERS,
+                                            event)
 
     # now create a span representing the work of this entire function
-    with opentracing.tracer.start_active_span("example-operation", child_of=parent_ctx) as request_scope:
+    with opentracing.tracer.start_active_span("example-operation",
+                                              child_of=parent_ctx) as request_scope:
 
         # log any important tags/baggage to the handler's span
         span = request_scope.span

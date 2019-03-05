@@ -15,7 +15,7 @@ class SpanRecorder(ABC):
 
         :param BasicSpan span: the finish()'d Span object.
         """
-        pass
+        raise NotImplementedError()
 
 
 class NoopRecorder(SpanRecorder):
