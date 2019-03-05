@@ -6,11 +6,16 @@ Further information can be found on [opentracing.io](https://opentracing.io/)
 ## Using this library
 See examples in /examples directory. 
 
+First initialize the tracer at the application level by supplying a service name and recorder
+```python
+opentracing.tracer = HaystackTracer("a_service", recorder)
+```
+
 **If there is a Scope, it will act as the parent to any newly started Span** unless the programmer passes 
 `ignore_active_span=True` at `start_span()/start_active_span()` time or specified parent context explicitly using 
 `childOf=parent_context`
 
-As demonstrated in the examples, starting a span can be done as a managed resource using `start_active_span()`
+Starting a span can be done as a managed resource using `start_active_span()`
 ```python
 with opentracing.tracer.start_active_span("span-name") as scope:
     do_stuff()
