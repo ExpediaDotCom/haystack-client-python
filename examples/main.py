@@ -91,14 +91,3 @@ if __name__ == "__main__":
     # uncomment line below to send traces to haystack collector using http recorder
     # use_http_recorder()
     main()
-
-
-
-
-
-
-
-
-
-
-
