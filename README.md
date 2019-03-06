@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/ExpediaDotCom/haystack-client-python.svg?branch=master)](https://travis-ci.org/ExpediaDotCom/haystack-client-python)
+[![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/ExpediaDotCom/haystack/blob/master/LICENSE)
+
 # Haystack bindings for Python OpenTracing API
 This is Haystack's client library for Python that implements [OpenTracing](https://github.com/opentracing/opentracing-python/)
 
@@ -8,7 +11,11 @@ See examples in /examples directory.
 
 First initialize the tracer at the application level by supplying a service name and recorder
 ```python
-opentracing.tracer = HaystackTracer("a_service", recorder)
+import opentracing
+from haystack import HaystackAgentRecorder
+from haystack import HaystackTracer
+
+opentracing.tracer = HaystackTracer("a_service", HaystackAgentRecorder())
 ```
 
 **If there is a Scope, it will act as the parent to any newly started Span** unless the programmer passes 
@@ -43,4 +50,4 @@ Create a python3 virtual environment, activate it and then `make bootstrap`
 `make example`
 
 ## How to Release this library
-TBD
+Create a new release in github specifying a semver compliant tag greater than the current release version.

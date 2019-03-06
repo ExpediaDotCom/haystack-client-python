@@ -17,7 +17,7 @@ example: bootstrap
 .PHONY: lint
 lint:
 	pip install flake8
-	python -m flake8 ./haystack --exclude *_pb2*
+	python -m flake8 ./haystack --exclude *_pb2* && echo "Flake8 passed without any issues!"
 	
 .PHONY: integration_tests
 integration_tests:
@@ -32,16 +32,11 @@ integration_tests:
 		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'
 	docker-compose -f tests/integration/docker-compose.yml -p sandbox stop
 
-.PHONY: dist
-dist: bootstrap lint test integration_tests
-	pip install wheel
-	python setup.py sdist
-	python setup.py bdist_wheel
-	
-.PHONY: publish
-publish:
-	pip install twine
-	python -m twine upload dist/*
+.PHONY: set_version
+set_version:
+	pip install semver
+	pip install requests
+	python ./scripts/version.py
 	
 .PHONY: proto_compile
 proto_compile:
