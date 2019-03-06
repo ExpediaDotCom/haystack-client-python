@@ -22,11 +22,12 @@ lint:
 .PHONY: integration_tests
 integration_tests:
 	docker-compose -f tests/integration/docker-compose.yml -p sandbox up -d
+	echo "sleeping for 15s while kafka/zookeeper initialize"
 	sleep 15
-	docker run -it
+	docker run -it \
 	    --rm \
 		--network=sandbox_default \
-		-v $(pwd):/ws \
+		-v $(PWD):/ws \
 		-w /ws \
 		python:3.6 \
 		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'
