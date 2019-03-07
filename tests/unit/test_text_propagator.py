@@ -10,15 +10,21 @@ class TextPropagatorTest(unittest.TestCase):
 
     def test_message_id_in_carrier_should_be_extracted_as_span_id(self):
         span_id = "1234"
-        carrier = {"Message-ID": span_id, "Trace-ID": "123456"}
+        parent_id = "4321"
+        trace_id = "1212"
+        carrier = {"Message-ID": span_id, "Parent-Message-ID": parent_id,
+                   "Trace-ID": trace_id}
 
         ctx = self.propagator.extract(carrier)
 
         self.assertEqual(ctx.span_id, span_id)
+        self.assertEqual(ctx.parent_id, parent_id)
+        self.assertEqual(ctx.trace_id, trace_id)
 
     def test_corrupted_context_throws_exception(self):
         span_id = "1234"
-        carrier = {"Message-ID": span_id, "Span-ID": "123456", "Trace-ID": "1234567"}  # two span id's are invalid
+        carrier = {"Message-ID": span_id, "Span-ID": "123456",
+                   "Trace-ID": "1234567"}  # two span id's are invalid
 
         self.assertRaises(SpanContextCorruptedException, self.propagator.extract, carrier)
 

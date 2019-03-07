@@ -12,7 +12,8 @@ class HaystackTracer(Tracer):
                  service_name,
                  recorder,
                  scope_manager=None,
-                 common_tags=None):
+                 common_tags=None,
+                 use_shared_spans=False):
         """
         Initialize a Haystack Tracer instance.
         :param service_name: The service name to which all spans will belong.
@@ -22,6 +23,9 @@ class HaystackTracer(Tracer):
         ThreadLocal scope manager.
         :param common_tags: An optional dictionary of tags which should be
         applied to all created spans for this service
+        :param use_shared_spans: A boolean indicating whether or not to use
+        shared spans. This is when client/server spans share the same span id.
+        Default is to use unique span ids.
         """
 
         scope_manager = ThreadLocalScopeManager() if scope_manager is None \
@@ -31,6 +35,7 @@ class HaystackTracer(Tracer):
         self._common_tags = {} if common_tags is None else common_tags
         self.service_name = service_name
         self.recorder = recorder
+        self.use_shared_spans = use_shared_spans
         self.register_propagator(Format.TEXT_MAP, TextPropagator())
         self.register_propagator(Format.HTTP_HEADERS, TextPropagator())
 
@@ -87,10 +92,14 @@ class HaystackTracer(Tracer):
 
         new_ctx = SpanContext(span_id=format(uuid.uuid4()))
         if parent_ctx is not None:
+            new_ctx.trace_id = parent_ctx.trace_id
             if parent_ctx.baggage is not None:
                 new_ctx._baggage = parent_ctx.baggage.copy()
-            new_ctx.trace_id = parent_ctx.trace_id
-            new_ctx.parent_id = parent_ctx.span_id
+            if self.use_shared_spans:
+                new_ctx.span_id = parent_ctx.span_id
+                new_ctx.parent_id = parent_ctx.parent_id
+            else:
+                new_ctx.parent_id = parent_ctx.span_id
         else:
             new_ctx.trace_id = format(uuid.uuid4())
 

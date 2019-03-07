@@ -1,11 +1,25 @@
 sudo: required
 
 dist: trusty
-
 language: python
+python: 3.6
 
 services:
   - docker
-  
-install:
-  - make bootstrap
+
+install: make bootstrap
+
+script: make lint test integration_tests
+
+before_deploy:
+  - git stash --all
+  - make set_version
+deploy:
+  provider: pypi
+  user: $PYPI_USERNAME
+  password: $PYPI_PASSWORD
+  distributions: "sdist bdist_wheel"
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
