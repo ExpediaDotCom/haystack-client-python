@@ -40,7 +40,8 @@ class TextPropagator(Propagator):
             elif lc_key.startswith(
                     self._propagator_opts.baggage_key_prefix.lower()):
                 baggage[
-                    key[len(self._propagator_opts.baggage_key_prefix):]] = value
+                    key[len(self._propagator_opts.baggage_key_prefix):]] = \
+                    value
             elif lc_key == self._propagator_opts.parent_id_key.lower():
                 parent_id = value
 
