@@ -1,16 +1,14 @@
 # Name of the HTTP header or Key used to encode Trace ID
-TRACE_ID_HEADER = "Trace-ID"
+TRACE_ID = "Trace-ID"
 
-# Name of the HTTP header or Key used to encode Span ID followed by any
-# alternate header names to extract as Span ID
-SPAN_ID_HEADERS = ("Span-ID", "Message-ID",)
+# Name of the HTTP header or Key used to encode Span ID
+SPAN_ID = "Span-ID"
 
-# Name of the HTTP header or Key used to encode Parent Span ID followed by any
-# alternate header names to extract as Parent Span ID
-PARENT_SPAN_ID_HEADERS = ("Parent-ID", "Parent-Message-ID",)
+# Name of the HTTP header or Key used to encode Parent Span ID
+PARENT_SPAN_ID = "Parent-ID"
 
 # Prefix of the HTTP header or Key used to encode Baggage items
-BAGGAGE_HEADER_PREFIX = "Baggage-"
+BAGGAGE_PREFIX = "Baggage-"
 
 # The number of microseconds in one second
 SECONDS_TO_MICRO = 1000000

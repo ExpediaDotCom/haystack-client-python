@@ -5,6 +5,8 @@ from opentracing.ext import tags
 from haystack import HaystackTracer
 from haystack import AsyncHttpRecorder
 from haystack import LoggerRecorder
+from haystack.text_propagator import TextPropagator
+from haystack.propagator import PropagatorOpts
 
 recorder = LoggerRecorder()
 logging.basicConfig(level=logging.DEBUG)
@@ -14,6 +16,10 @@ def act_as_remote_service(headers):
     # remote service would have it"s own tracer
     with HaystackTracer("Service-B", recorder,) as tracer:
         opentracing.tracer = tracer
+
+        # ---ability to use custom propagation headers if needed---
+        # prop_opts = PropagatorOpts("X-Trace-ID", "X-Span-ID", "X-Parent-Span")
+        # opentracing.tracer.register_propagator(opentracing.Format.HTTP_HEADERS, TextPropagator(prop_opts))
 
         # simulate network transfer delay
         time.sleep(.25)
