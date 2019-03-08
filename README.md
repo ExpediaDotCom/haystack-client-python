@@ -19,7 +19,7 @@ from haystack import HaystackTracer
 opentracing.tracer = HaystackTracer("a_service", HaystackAgentRecorder())
 ```
 
-Starting a span can be done as a managed resource using `tracer.start_active_span()`
+Starting a span can be done as a managed resource using `start_active_span()`
 ```python
 with opentracing.tracer.start_active_span("span-name") as scope:
     do_stuff()
