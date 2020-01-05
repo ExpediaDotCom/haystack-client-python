@@ -45,7 +45,10 @@ class SyncHttpRecorder(SpanRecorder):
     @staticmethod
     def get_json_payload(span):
         json_span = span_to_json(span)
-        str_span = json.dumps(json_span)
+        str_span = json.dumps(
+            json_span,
+            default=lambda o: f"{o.__class__.__name__} is not JSON serializable"
+        )
         return str_span.encode("utf-8")
 
     @staticmethod
@@ -64,8 +67,11 @@ class SyncHttpRecorder(SpanRecorder):
                          f"to {e}")
 
     def record_span(self, span):
-        payload = self.get_json_payload(span) if self._use_json_payload \
-            else self.get_binary_payload(span)
+        try:
+            payload = self.get_json_payload(span) if self._use_json_payload \
+                else self.get_binary_payload(span)
+        except TypeError:
+            logger.exception("failed to convert span")
         self.post_payload(payload)
 
 

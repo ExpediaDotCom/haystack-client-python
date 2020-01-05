@@ -9,14 +9,16 @@ Further information can be found on [opentracing.io](https://opentracing.io/)
 ## Using this library
 See examples in /examples directory. See opentracing [usage](https://github.com/opentracing/opentracing-python/#usage) for additional information.
 
+It is important to consider the architecture of the application. In order for the tracer to manage spans properly, an appropriate `ScopeManager` implementation must be chosen.  In most environments, the default `ThreadLocalScopeManager` will work just fine. In asynchronous frameworks, the `ContextVarsScopeManager` is a better choice.  
 
-First initialize the tracer at the application level by supplying a service name and recorder
+First initialize the tracer at the application level by supplying a service name and span recorder
 ```python
 import opentracing
 from haystack import HaystackAgentRecorder
 from haystack import HaystackTracer
 
-opentracing.tracer = HaystackTracer("a_service", HaystackAgentRecorder())
+tracer = HaystackTracer("a_service", HaystackAgentRecorder())
+opentracing.set_global_tracer(tracer)
 ```
 
 Starting a span can be done as a managed resource using `start_active_span()`

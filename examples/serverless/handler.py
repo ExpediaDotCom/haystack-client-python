@@ -2,7 +2,7 @@
 import opentracing
 import os
 from requests import RequestException
-from opentracing.ext import tags
+from opentracing import tags
 from haystack import HaystackTracer
 from haystack import SyncHttpRecorder
 
@@ -25,8 +25,9 @@ recorder = SyncHttpRecorder(os.env["COLLECTOR_URL"])
 common_tags = {
     "svc_ver": os["APP_VERSION"]
 }
-opentracing.tracer = HaystackTracer("example-service",
-                                    recorder, common_tags=common_tags)
+tracer = HaystackTracer("example-service",
+                        recorder, common_tags=common_tags)
+opentracing.set_global_tracer(tracer)
 
 
 def invoke_downstream(headers):
