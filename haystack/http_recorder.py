@@ -47,7 +47,7 @@ class SyncHttpRecorder(SpanRecorder):
         json_span = span_to_json(span)
         str_span = json.dumps(
             json_span,
-            default=lambda o: f"{o.__class__.__name__} is not JSON serializable"
+            default=lambda o: f"{o.__class__.__name__} is not serializable"
         )
         return str_span.encode("utf-8")
 
