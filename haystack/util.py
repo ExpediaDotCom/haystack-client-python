@@ -1,7 +1,10 @@
 from .span_pb2 import Span, Tag
 from .constants import SECONDS_TO_MICRO
+from types import TracebackType
 import numbers
 import logging
+import json
+import traceback
 
 logger = logging.getLogger("haystack")
 
@@ -25,27 +28,36 @@ def logs_as_list(logs):
     return log_list
 
 
-def set_tag_value(tag, value):
-    if isinstance(value, numbers.Integral):
-        tag.vLong = value
-        tag.type = Tag.LONG
-    elif isinstance(value, str):
+def set_proto_tag_value(tag, value):
+    if isinstance(value, str):
         tag.vStr = value
         tag.type = Tag.STRING
     elif isinstance(value, bool):
         tag.vBool = value
         tag.type = Tag.BOOL
+    elif isinstance(value, numbers.Integral):
+        tag.vLong = value
+        tag.type = Tag.LONG
     elif isinstance(value, float):
         tag.vDouble = value
         tag.type = Tag.DOUBLE
     elif isinstance(value, bytes):
         tag.vBytes = value
         tag.type = Tag.BINARY
+    elif isinstance(value, dict):
+        tag.vStr = json.dumps(value)
+        tag.type = Tag.STRING
+    elif isinstance(value, type):
+        tag.vStr = str(value)
+        tag.type = Tag.STRING
+    elif isinstance(value, TracebackType):
+        tag.vStr = str(traceback.format_tb(value))
+        tag.type = Tag.STRING
     else:
         logger.error(f"Dropped tag {tag.key} due to "
                      f"invalid value type of {type(value)}. "
-                     f"Type must be Int, String, Bool, Float or Bytes")
-        tag.vStr = ""
+                     f"Type must be Int, String, Bool, Float, Dict or Bytes")
+        tag.vStr = f"Unserializable object type: {str(type(value))}"
         tag.type = Tag.STRING
 
 
@@ -53,17 +65,17 @@ def add_proto_tags(span_record, tags):
     for key, value in tags.items():
         tag = span_record.tags.add()
         tag.key = key
-        set_tag_value(tag, value)
+        set_proto_tag_value(tag, value)
 
 
-def add_proto_logs(span_record, logs):
-    for log_data in logs:
+def add_proto_logs(span_record, span_logs):
+    for log_data in span_logs:
         log_record = span_record.logs.add()
         log_record.timestamp = int(log_data.timestamp * SECONDS_TO_MICRO)
         for key, value in log_data.key_values.items():
             tag = log_record.fields.add()
             tag.key = key
-            set_tag_value(tag, value)
+            set_proto_tag_value(tag, value)
 
 
 def span_to_proto(span):
