@@ -105,7 +105,8 @@ class HaystackTracer(Tracer):
 
         # Set common tags
         if self._common_tags:
-            tags = {**self._common_tags, **tags} if tags else self._common_tags
+            tags = {**self._common_tags, **tags} if tags else \
+                self._common_tags.copy()
 
         return Span(self,
                     operation_name=operation_name,
