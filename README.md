@@ -51,6 +51,19 @@ All modules define their logger via `logging.getLogger(__name__)`
 So in order to define specific logging format or level for this library use `getLogger('haystack')` or configure the
 root logger.
 
+### B3 propagation
+B3 propagation is supported by enabling the flag use_b3_propagation in HaystackTracer
+```python
+import opentracing
+from haystack import HaystackAgentRecorder
+from haystack import HaystackTracer
+use_b3_propagation = True
+tracer = HaystackTracer("a_service", HaystackAgentRecorder(), use_b3_propagation=use_b3_propagation)
+opentracing.set_global_tracer(tracer)
+```
+In order to set the appropriate headers with "X-B3-" format, please see above section "Custom propagation headers" for
+more information.
+
 ## How to configure build environment
 Create a python3 virtual environment, activate it and then `make bootstrap`
 

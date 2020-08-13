@@ -15,7 +15,7 @@ class HaystackTracer(Tracer):
                  scope_manager=None,
                  common_tags=None,
                  use_shared_spans=False,
-                 use_b3_ids=False):
+                 use_b3_propagation=False):
         """
         Initialize a Haystack Tracer instance.
         :param service_name: The service name to which all spans will belong.
@@ -28,7 +28,7 @@ class HaystackTracer(Tracer):
         :param use_shared_spans: A boolean indicating whether or not to use
         shared spans. This is when client/server spans share the same span id.
         Default is to use unique span ids.
-        :param use_b3_ids: A boolean indicating whether or not tu use
+        :param use_b3_propagation: A boolean indicating whether or not tu use
         128 bit hex char ids instead of UUIDs.
         """
 
@@ -40,7 +40,7 @@ class HaystackTracer(Tracer):
         self.service_name = service_name
         self.recorder = recorder
         self.use_shared_spans = use_shared_spans
-        self.use_b3_ids = use_b3_ids
+        self.use_b3_propagation = use_b3_propagation
         self.register_propagator(Format.TEXT_MAP, TextPropagator())
         self.register_propagator(Format.HTTP_HEADERS, TextPropagator())
 
@@ -98,7 +98,7 @@ class HaystackTracer(Tracer):
         id_generator = IdGenerator()
         generated_span_id = id_generator.generate()
         generated_trace_id = id_generator.generate()
-        if self.use_b3_ids is not None and self.use_b3_ids:
+        if self.use_b3_propagation is not None and self.use_b3_propagation:
             generated_span_id = id_generator.generate_span_id()
             generated_trace_id = id_generator.generate_trace_id()
 
