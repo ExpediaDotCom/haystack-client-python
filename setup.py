@@ -16,7 +16,7 @@ setup(
                       "requests>=2.19,<3.0",
                       "requests-futures>=0.9.9,<1.0",
                       "protobuf>=3.11.2,<4.0",
-                      "grpcio>=1.26.0,<2.0]"],
+                      "grpcio>=1.26.0,<2.0"],
     tests_require=["mock",
                    "nose",
                    "pytest",
