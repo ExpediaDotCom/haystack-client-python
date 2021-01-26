@@ -29,7 +29,7 @@ integration_tests:
 		--network=sandbox_default \
 		-v $(PWD):/ws \
 		-w /ws \
-		python:3.6 \
+		python:3.8 \
 		/bin/sh -c 'python setup.py install && pip install kafka-python && python tests/integration/integration.py'
 	docker-compose -f tests/integration/docker-compose.yml -p sandbox stop
 

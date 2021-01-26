@@ -29,7 +29,7 @@ class HaystackAgentRecorder(SpanRecorder):
             else:
                 logger.debug("Successfully submitted span to haystack-agent")
         except grpc.RpcError:
-            logger.exception(f"Dispatch failed due to RPC error")
+            logger.exception("Dispatch failed due to RPC error")
 
     def record_span(self, span):
         future = self._stub.dispatch.future(span_to_proto(span))

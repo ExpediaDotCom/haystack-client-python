@@ -1,11 +1,18 @@
-sudo: required
-
-dist: trusty
 language: python
-python: 3.6
+python: 3.8
+os: linux
 
 services:
   - docker
+
+env:
+  - DOCKER_COMPOSE_VERSION=1.24.1
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 install: make bootstrap
 
@@ -16,10 +23,10 @@ before_deploy:
   - make set_version
 deploy:
   provider: pypi
-  user: $PYPI_USERNAME
+  username: $PYPI_USERNAME
   password: $PYPI_PASSWORD
   distributions: "sdist bdist_wheel"
-  skip_cleanup: true
+  cleanup: false
   on:
     branch: master
     tags: true
