@@ -1,8 +1,7 @@
-sudo: required
-
 dist: trusty
 language: python
-python: 3.6
+python: 3.8
+os: linux
 
 services:
   - docker
@@ -16,10 +15,10 @@ before_deploy:
   - make set_version
 deploy:
   provider: pypi
-  user: $PYPI_USERNAME
+  username: $PYPI_USERNAME
   password: $PYPI_PASSWORD
   distributions: "sdist bdist_wheel"
-  skip_cleanup: true
+  cleanup: false
   on:
     branch: master
     tags: true
