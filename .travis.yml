@@ -23,10 +23,10 @@ before_deploy:
   - make set_version
 deploy:
   provider: pypi
-  username: $PYPI_USERNAME
+  user: $PYPI_USERNAME
   password: $PYPI_PASSWORD
   distributions: "sdist bdist_wheel"
-  cleanup: false
+  skip_cleanup: true
   on:
     branch: master
     tags: true
