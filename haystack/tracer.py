@@ -1,7 +1,8 @@
 import time
-import uuid
 from opentracing import Format, Tracer, UnsupportedFormatException
 from opentracing.scope_managers import ThreadLocalScopeManager
+
+from .id_generator import IdGenerator
 from .text_propagator import TextPropagator
 from .span import Span, SpanContext
 
@@ -13,7 +14,8 @@ class HaystackTracer(Tracer):
                  recorder,
                  scope_manager=None,
                  common_tags=None,
-                 use_shared_spans=False):
+                 use_shared_spans=False,
+                 use_b3_propagation=False):
         """
         Initialize a Haystack Tracer instance.
         :param service_name: The service name to which all spans will belong.
@@ -26,6 +28,8 @@ class HaystackTracer(Tracer):
         :param use_shared_spans: A boolean indicating whether or not to use
         shared spans. This is when client/server spans share the same span id.
         Default is to use unique span ids.
+        :param use_b3_propagation: A boolean indicating whether or not tu use
+        128 bit hex char ids instead of UUIDs.
         """
 
         scope_manager = ThreadLocalScopeManager() if scope_manager is None \
@@ -36,6 +40,7 @@ class HaystackTracer(Tracer):
         self.service_name = service_name
         self.recorder = recorder
         self.use_shared_spans = use_shared_spans
+        self.use_b3_propagation = use_b3_propagation
         self.register_propagator(Format.TEXT_MAP, TextPropagator())
         self.register_propagator(Format.HTTP_HEADERS, TextPropagator())
 
@@ -90,7 +95,14 @@ class HaystackTracer(Tracer):
             if scope is not None:
                 parent_ctx = scope.span.context
 
-        new_ctx = SpanContext(span_id=format(uuid.uuid4()))
+        id_generator = IdGenerator()
+        generated_span_id = id_generator.generate()
+        generated_trace_id = id_generator.generate()
+        if self.use_b3_propagation is not None and self.use_b3_propagation:
+            generated_span_id = id_generator.generate_span_id()
+            generated_trace_id = id_generator.generate_trace_id()
+
+        new_ctx = SpanContext(span_id=generated_span_id)
         if parent_ctx is not None:
             new_ctx.trace_id = parent_ctx.trace_id
             if parent_ctx.baggage is not None:
@@ -101,7 +113,7 @@ class HaystackTracer(Tracer):
             else:
                 new_ctx.parent_id = parent_ctx.span_id
         else:
-            new_ctx.trace_id = format(uuid.uuid4())
+            new_ctx.trace_id = generated_trace_id
 
         # Set common tags
         if self._common_tags:
