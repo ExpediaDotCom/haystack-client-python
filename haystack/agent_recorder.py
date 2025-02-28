@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 class HaystackAgentRecorder(SpanRecorder):
     """
     HaystackAgentRecorder is to be used with the haystack-agent described
-    here (https://github.com/ExpediaInc/haystack-agent)
     """
 
     def __init__(self, agent_host="haystack-agent", agent_port=35000):
